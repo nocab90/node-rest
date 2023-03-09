@@ -16,9 +16,12 @@ const middleware = (req, res, next) => {
     console.log('Hello from middleware.');
 
     //Set up user variable globally
-    req.user = "John Smith";
+    // req.user = "John Smith";
+    req.requestMethod = req.method;
     next();
 }
+
+app.use(middleware);
 
 //Importing all routes
 const jobs = require('./routes/jobs');
