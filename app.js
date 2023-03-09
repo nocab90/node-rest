@@ -11,8 +11,11 @@ dotenv.config({path: "./config/config.env"})
 //Connect to database
 connectDatabase();
 
+// Setup bodyparser
+app.use(express.json());
+
 //Creating own middleware
-const middleware = (req, res, next) => {
+/* const middleware = (req, res, next) => {
     console.log('Hello from middleware.');
 
     //Set up user variable globally
@@ -21,7 +24,7 @@ const middleware = (req, res, next) => {
     next();
 }
 
-app.use(middleware);
+app.use(middleware); */
 
 //Importing all routes
 const jobs = require('./routes/jobs');
