@@ -2,9 +2,10 @@ const Job = require('../models/jobs');
 
 const geoCoder = require('../utils/geocoder');
 const ErrorHandler = require('../utils/errorHandler');
+const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 
 //Get all Jobs => /api/v1/jobs
-exports.getJobs = async (req, res, next) => {
+exports.getJobs = catchAsyncErrors( async (req, res, next) => {
 
     const jobs = await Job.find();
 
@@ -16,10 +17,10 @@ exports.getJobs = async (req, res, next) => {
         results: jobs.length,
         data: jobs
     });
-}
+});
 
 //Create a new Job => /api/v1/job/new
-exports.newJob = async (req, res, next) => {
+exports.newJob = catchAsyncErrors(async (req, res, next) => {
 
     const job = await Job.create(req.body);
 
@@ -28,11 +29,11 @@ exports.newJob = async (req, res, next) => {
         message: 'Job Created.',
         data: job
     })
-}
+});
 
 //Get a single job with id and slug => /api/v1/job/:id/:slug
-exports.getJob = async (req, res, next) => {
-    const job = await Job.find({$and: [{_id:req.params.id}, {slug: req.params.slug}]});
+exports.getJob = catchAsyncErrors( async (req, res, next) => {
+    const job = await Job.find({ $and: [{ _id: req.params.id }, { slug: req.params.slug }] });
 
     if (!job || job.length === 0) {
         return res.status(404).json({
@@ -45,13 +46,13 @@ exports.getJob = async (req, res, next) => {
         success: true,
         data: job
     })
-}
+});
 
 //Update a Job => /api/v1/job/:id
-exports.updateJob = async (req, res, next) => {
+exports.updateJob = catchAsyncErrors( async (req, res, next) => {
     let job = await Job.findById(req.params.id);
 
-    if(!job) {
+    if (!job) {
         return next(new ErrorHandler('Job not found.', 404));
     }
 
@@ -65,9 +66,9 @@ exports.updateJob = async (req, res, next) => {
         message: 'Job is updated.',
         data: job
     });
-}
+});
 
-exports.deleteJob = async (req, res, next) => {
+exports.deleteJob = catchAsyncErrors( async (req, res, next) => {
     let job = await Job.findById(req.params.id);
 
     if (!job) {
@@ -84,10 +85,10 @@ exports.deleteJob = async (req, res, next) => {
         message: 'Job is deleted.',
         data: job
     });
-}
+});
 
 //Search jobs within radius => /api/v1/jobs/:zipcode/:distance
-exports.getJobsInRadius = async (req, res, next) => {
+exports.getJobsInRadius = catchAsyncErrors( async (req, res, next) => {
     const { zipcode, distance } = req.params;
 
     //Getting latitude & longitude from geocoder with zipcode
@@ -107,4 +108,4 @@ exports.getJobsInRadius = async (req, res, next) => {
         results: jobs.length,
         data: jobs
     });
-};
+});
