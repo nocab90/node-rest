@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 
 const connectDatabase = require('./config/database');
 const errorMiddleware = require('./middlewares/errors');
+const ErrorHandler = require('./utils/errorHandler');
 
 //Setting up config.env file vars
 dotenv.config({path: "./config/config.env"})
@@ -37,7 +38,12 @@ app.use(middleware); */
 //Importing all routes
 const jobs = require('./routes/jobs');
 
+//Routes
 app.use('/api/v1', jobs);
+//Wildcard route should be after all other routes, otherwise it will catch everything.
+app.all('*', (req, res, next) => {
+    next(new ErrorHandler(`${req.originalUrl} route not found`, 404));
+});
 
 //Middleware to handle errors
 app.use(errorMiddleware);
