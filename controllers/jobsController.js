@@ -3,11 +3,20 @@ const Job = require('../models/jobs');
 const geoCoder = require('../utils/geocoder');
 const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
+const APIFilters = require('../utils/apiFilters');
 
 //Get all Jobs => /api/v1/jobs
-exports.getJobs = catchAsyncErrors( async (req, res, next) => {
+exports.getJobs = catchAsyncErrors(async (req, res, next) => {
 
-    const jobs = await Job.find();
+    //req.query (e.g. ?jobtype=Permanent or ?sort=salary)
+    const apiFilters = new APIFilters(Job.find(), req.query)
+        .filter()
+        .sort()
+        .limitFields()
+        .searchByQuery()
+        .pagination();
+        
+    const jobs = await apiFilters.query;
 
     res.status(200).json({
         success: true,
@@ -32,7 +41,7 @@ exports.newJob = catchAsyncErrors(async (req, res, next) => {
 });
 
 //Get a single job with id and slug => /api/v1/job/:id/:slug
-exports.getJob = catchAsyncErrors( async (req, res, next) => {
+exports.getJob = catchAsyncErrors(async (req, res, next) => {
     const job = await Job.find({ $and: [{ _id: req.params.id }, { slug: req.params.slug }] });
 
     if (!job || job.length === 0) {
@@ -46,7 +55,7 @@ exports.getJob = catchAsyncErrors( async (req, res, next) => {
 });
 
 //Update a Job => /api/v1/job/:id
-exports.updateJob = catchAsyncErrors( async (req, res, next) => {
+exports.updateJob = catchAsyncErrors(async (req, res, next) => {
     let job = await Job.findById(req.params.id);
 
     if (!job) {
@@ -65,7 +74,7 @@ exports.updateJob = catchAsyncErrors( async (req, res, next) => {
     });
 });
 
-exports.deleteJob = catchAsyncErrors( async (req, res, next) => {
+exports.deleteJob = catchAsyncErrors(async (req, res, next) => {
     let job = await Job.findById(req.params.id);
 
     if (!job) {
@@ -82,7 +91,7 @@ exports.deleteJob = catchAsyncErrors( async (req, res, next) => {
 });
 
 //Search jobs within radius => /api/v1/jobs/:zipcode/:distance
-exports.getJobsInRadius = catchAsyncErrors( async (req, res, next) => {
+exports.getJobsInRadius = catchAsyncErrors(async (req, res, next) => {
     const { zipcode, distance } = req.params;
 
     //Getting latitude & longitude from geocoder with zipcode
