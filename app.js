@@ -32,7 +32,7 @@ const jobs = require('./routes/jobs');
 
 app.use('/api/v1', jobs);
 
-//Use error middlewares
+//Middleware to handle errors
 app.use(errorMiddleware);
 
 const PORT = process.env.PORT;

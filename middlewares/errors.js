@@ -19,14 +19,7 @@ module.exports = (err, req, res, next) => {
 
         res.status(err.statusCode).json({
             success: false,
-            message: err.message
+            message: err.message || 'Internal Server Error'
         });
     };
-
-    err.message = err.message || 'Internal Server Error';
-
-    res.status(error.statusCode).json({
-        success: false,
-        message: err.message
-    });
 };
