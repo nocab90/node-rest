@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 
 const dotenv = require('dotenv');
+const cookieParser = require('cookie-parser');
 
 const connectDatabase = require('./config/database');
 const errorMiddleware = require('./middlewares/errors');
@@ -23,6 +24,9 @@ connectDatabase();
 // Setup bodyparser
 app.use(express.json());
 
+//Set cookie parser
+app.use(cookieParser());
+
 //Creating own middleware
 /* const middleware = (req, res, next) => {
     console.log('Hello from middleware.');
@@ -37,9 +41,11 @@ app.use(middleware); */
 
 //Importing all routes
 const jobs = require('./routes/jobs');
+const auth = require('./routes/auth');
 
 //Routes
 app.use('/api/v1', jobs);
+app.use('/api/v1', auth);
 //Wildcard route should be after all other routes, otherwise it will catch everything.
 app.all('*', (req, res, next) => {
     next(new ErrorHandler(`${req.originalUrl} route not found`, 404));
